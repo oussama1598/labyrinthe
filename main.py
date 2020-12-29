@@ -2,6 +2,8 @@ import sys
 from time import sleep
 
 import sdl2.ext
+
+from app.helpers.colors import WHITE
 from app.modules.cell import Cell
 from app.modules.maze_generator import RandomizedDepthFirstSearchMazeGenerator
 from app.modules.window import Window
@@ -41,6 +43,14 @@ def draw():
     for row in cells:
         for cell in row:
             cell.draw(surface)
+
+    # Add boundaries
+
+    # Right wall
+    sdl2.ext.line(surface, WHITE, (COLUMNS * SIZE, 0, COLUMNS * SIZE, ROWS * SIZE))
+
+    # Bottom wall
+    sdl2.ext.line(surface, WHITE, (0, COLUMNS * SIZE, COLUMNS * SIZE, ROWS * SIZE))
 
 
 def run():

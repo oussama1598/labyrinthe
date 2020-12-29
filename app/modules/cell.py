@@ -20,12 +20,11 @@ class Cell:
         self.fill = color
 
     def draw(self, surface):
-        if self.fill:
-            sdl2.ext.fill(surface, self.fill, (self.x * self.size, self.y * self.size, self.size, self.size))
-
         if self.visited:
             sdl2.ext.fill(surface, BLUE, (self.x * self.size, self.y * self.size, self.size, self.size))
 
+        if self.fill:
+            sdl2.ext.fill(surface, self.fill, (self.x * self.size, self.y * self.size, self.size, self.size))
 
         if self.top:
             x1 = self.size * self.x
