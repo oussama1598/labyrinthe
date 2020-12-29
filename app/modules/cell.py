@@ -13,18 +13,18 @@ class Cell:
         self.top = True
         self.left = True
 
-        self.fill = None
+        self.fill_color = None
         self.visited = False
 
     def fill(self, color=RED):
-        self.fill = color
+        self.fill_color = color
 
     def draw(self, surface):
         if self.visited:
             sdl2.ext.fill(surface, BLUE, (self.x * self.size, self.y * self.size, self.size, self.size))
 
-        if self.fill:
-            sdl2.ext.fill(surface, self.fill, (self.x * self.size, self.y * self.size, self.size, self.size))
+        if self.fill_color:
+            sdl2.ext.fill(surface, self.fill_color, (self.x * self.size, self.y * self.size, self.size, self.size))
 
         if self.top:
             x1 = self.size * self.x
