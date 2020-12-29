@@ -3,7 +3,7 @@ from time import sleep
 
 import sdl2.ext
 from app.modules.cell import Cell
-from app.modules.maze_generator import RandomizedKruskalMazeGenerator
+from app.modules.maze_generator import RandomizedDepthFirstSearchMazeGenerator
 from app.modules.window import Window
 
 sdl2.ext.init()
@@ -25,12 +25,9 @@ cells = [
     for y in range(ROWS)
 ]
 
-maze_generator = RandomizedKruskalMazeGenerator(
+maze_generator = RandomizedDepthFirstSearchMazeGenerator(
     ROWS, COLUMNS, cells
 )
-
-while maze_generator.sets.size() != 1:
-    maze_generator.generate()
 
 
 def draw():
@@ -38,21 +35,12 @@ def draw():
 
     sdl2.ext.fill(surface, 0)
 
-    root = None
-
-    # if maze_generator.sets.size() != 1:
-    #     maze_generator.generate()
-    # else:
-    root = maze_generator.get_start()
+    if maze_generator.tick():
+        maze_generator.generate()
 
     for row in cells:
         for cell in row:
-            fill = False
-
-            if root and root[0] == cell.x and root[1] == cell.y:
-                fill = True
-
-            cell.draw(surface, fill=fill)
+            cell.draw(surface)
 
 
 def run():

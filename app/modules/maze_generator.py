@@ -1,50 +1,75 @@
 import datetime
 import random
 
-from app.modules.disjoint_set import DisjointSets
 
-
-class RandomizedKruskalMazeGenerator:
+class RandomizedDepthFirstSearchMazeGenerator:
     def __init__(self, rows, columns, cells):
-        random.seed(datetime.datetime.now())
+        self.rows = rows
+        self.columns = columns
 
         self.cells = cells
+        self.stack = []
 
-        self.vertices = []
-        self.edges = []
+        random.seed(datetime.datetime.now())
 
-        for i in range(columns):
-            for j in range(rows):
-                self.vertices.append((i, j))
+        self.root = cells[0][0]
+        self.root.visited = True
 
-                self.edges.append((i, j, 'U'))
-                self.edges.append((i, j, 'L'))
+        self.stack.append(self.root)
 
-        self.sets = DisjointSets(self.vertices)
+    def _get_non_visited_neighbors(self, cell):
+        x, y = cell.x, cell.y
+
+        # TOP, RIGHT, BOTTOM, LEFT
+        neighbors_local_coordinates = [(0, -1, 'U'), (1, 0, 'LA'), (0, 1, 'UA'), (-1, 0, 'L')]
+        neighbors = []
+
+        for neighbor_coordinates in neighbors_local_coordinates:
+            neighbor_x = x + neighbor_coordinates[0]
+            neighbor_y = y + neighbor_coordinates[1]
+            neighbor_wall = neighbor_coordinates[2]
+
+            if 0 <= neighbor_x <= self.columns - 1 and 0 <= neighbor_y <= self.rows - 1:
+                cell = self.cells[neighbor_y][neighbor_x]
+
+                if cell.visited:
+                    continue
+
+                neighbors.append(
+                    (self.cells[neighbor_y][neighbor_x], neighbor_wall)
+                )
+
+        return neighbors
 
     def generate(self):
-        if len(self.edges) == 0:
+        current_cell = self.stack.pop()
+
+        neighbors = self._get_non_visited_neighbors(
+            current_cell
+        )
+
+        if len(neighbors) == 0:
             return
 
-        edge = random.choice(self.edges)
+        self.stack.append(current_cell)
 
-        self.edges.remove(edge)
+        neighbor, neighbor_wall = random.choice(neighbors)
 
-        i = edge[0]
-        j = edge[1]
-        position = edge[2]
+        if neighbor_wall == 'U':
+            current_cell.top = False
 
-        if i > 0 and position == 'L' and self.sets.root((i, j)) != self.sets.root((i - 1, j)):
-            self.sets.union((i, j), (i - 1, j))
+        if neighbor_wall == 'L':
+            current_cell.left = False
 
-            self.cells[i][j].left = False
+        if neighbor_wall == 'LA':
+            neighbor.left = False
 
-        if j > 0 and position == 'U' and self.sets.root((i, j)) != self.sets.root((i, j - 1)):
-            self.sets.union((i, j), (i, j - 1))
+        if neighbor_wall == 'UA':
+            neighbor.top = False
 
-            self.cells[i][j].top = False
+        neighbor.visited = True
 
-    def get_start(self):
-        for item in self.sets.sets_list:
-            if item.parent != item:
-                return item.root().data
+        self.stack.append(neighbor)
+
+    def tick(self):
+        return len(self.stack) != 0
